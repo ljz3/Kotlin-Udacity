@@ -8,6 +8,12 @@ fun feedTheFish() {
     val day = randomDay()
     val food = fishFood(day)
     println("Today is $day and the fish eat $food")
+
+    if(shouldChangeWater(day)){
+        println("Change water today")
+    }
+
+    dirtyProcessor()
 }
 
 fun randomDay(): String{
@@ -30,7 +36,8 @@ fun fishFood(day: String): String{
     return food
 }
 
-fun shouldChangeWater(day: String, temperature: Int = 22, dirty: Int = 20): Boolean{
+
+fun shouldChangeWater(day: String, temperature: Int = 22, dirty: Int = getDirtySensorReading()): Boolean{
     return when {
         isTooHot(temperature) -> true
         isDirty(dirty) -> true
@@ -38,6 +45,23 @@ fun shouldChangeWater(day: String, temperature: Int = 22, dirty: Int = 20): Bool
         else -> false
     }
 }
+
+var dirty = 20
+
+val waterFilter: (Int) -> Int = {dirty -> dirty/2}
+fun feedFish(dirty: Int) = dirty + 10
+
+fun updateDirty(dirty: Int, operation: (Int) -> Int):  Int{
+    return operation(dirty)
+}
+
+fun dirtyProcessor(){
+    dirty = updateDirty(dirty, waterFilter)
+    dirty = updateDirty(dirty, ::feedFish)
+    dirty = updateDirty(dirty){dirty -> dirty + 50}
+}
+
+fun getDirtySensorReading() = 20
 
 fun fitMoreFish(tankSize: Double, currentFish: List<Int>, fishSize: Int = 2, hasDecorations: Boolean = true): Boolean{
     var inches = currentFish.sum()
